@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+  <mx:Script>
+    <![CDATA[
+    
+      [Bindable]
+      private var version:String;
+            
+      private function init():void
+      {
+        var descriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+        var ns:Namespace = descriptor.namespaceDeclarations()[0];
+        version = descriptor.ns::version;        
+      }
+    ]]>
+  </mx:Script>
+  <mx:VBox horizontalAlign="center" horizontalCenter="0" verticalCenter="0" width="100%">
+    <mx:Label fontSize="38" fontWeight="bold" text="mohR"/> 
+    <mx:Label fontSize="24" text="version {version}"/>
+    <mx:Spacer height="24"/>
+    <mx:Text width="100%" textAlign="center" text="The first official trillr client. For questions, tipps and feature requests, please follow 'mohlendo', the creator of this remarkable tool ;-)"/>    
+  </mx:VBox>
+</mx:Canvas>

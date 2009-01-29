@@ -1,0 +1,62 @@
+<statuses>
+  <status>
+    <user>
+      <name>Homer Simpson</name>
+      <screen_name>mrx</screen_name>
+      <profile_image_url>/statuses/mrx.png</profile_image_url>
+    </user>
+    <source>trillr</source>
+    <created_at>10-10-2008T08:08:00Z</created_at>
+    <text>This is a mock!!</text>
+  </status>
+  <status>
+    <user>
+      <name>Homer Simpson</name>
+      <screen_name>mrx</screen_name>
+      <profile_image_url>/statuses/mrx.png</profile_image_url>
+    </user>
+    <source>trillr</source>
+    <created_at>10-10-2008T08:08:00Z</created_at>
+    <text>Dooooooooooh!</text>
+  </status>
+  <status>
+    <user>
+      <name>Homer Simpson</name>
+      <screen_name>mrx</screen_name>
+      <profile_image_url>/statuses/mrx.png</profile_image_url>
+    </user>
+    <source>trillr</source>
+    <created_at>10-10-2008T08:08:00Z</created_at>
+    <text>OMG! A fucking Donut!</text>
+  </status>
+  <status>
+    <user>
+      <name>Homer Simpson</name>
+      <screen_name>mrx</screen_name>
+      <profile_image_url>/statuses/mrx.png</profile_image_url>
+    </user>
+    <source>trillr</source>
+    <created_at>10-10-2008T08:08:00Z</created_at>
+    <text>My name is Mr. Burns. I am the boss of the nuclear power plant.</text>
+  </status>
+  <status>
+    <user>
+      <name>Homer Simpson</name>
+      <screen_name>mrx</screen_name>
+      <profile_image_url>/statuses/mrx.png</profile_image_url>
+    </user>
+    <source>trillr</source>
+    <created_at>10-10-2008T08:08:00Z</created_at>
+    <text>Dooooooooooh!</text>
+  </status>
+  <status>
+    <user>
+      <name>Homer Simpson</name>
+      <screen_name>mrx</screen_name>
+      <profile_image_url>/statuses/mrx.png</profile_image_url>
+    </user>
+    <source>trillr</source>
+    <created_at>10-10-2008T08:08:00Z</created_at>
+    <text>OMG! A fucking Donut!</text>
+  </status>
+</statuses>

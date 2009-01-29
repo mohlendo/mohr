@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Components
+  xmlns="config.*"  
+  xmlns:mx="http://www.adobe.com/2006/mxml" 
+  xmlns:controller="controller.*"
+   creationComplete="initComponents()">
+  
+  <mx:Script>
+    <![CDATA[
+       private function initComponents():void {
+         this.updateController = updateController;
+         this.analyticsTracker = tracker;
+       }
+    ]]>
+  </mx:Script>
+
+  <controller:UpdateController id="updateController"/>
+  
+  <analytics:FlexTracker
+        xmlns:analytics="com.google.analytics.components.*"
+        id="tracker"
+        account="UA-1937462-5"
+        mode="AS3"
+        visualDebug="false"
+     />
+
+
+</Components>

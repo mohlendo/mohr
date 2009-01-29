@@ -1,0 +1,77 @@
+/* CSS file */
+
+WindowedApplication 
+{
+	title-bar-colors: #9caa9d , #9caa9d;
+	status-bar-background-color: #9caa9d;
+	background-color: #9caa9d;
+	theme-color: #9caa9d;
+}
+
+Window
+{
+  title-bar-colors: #9caa9d , #9caa9d;
+	status-bar-background-color: #9caa9d;
+	background-color: #9caa9d;
+	theme-color: #9caa9d;
+}
+
+LinkBar {
+   disabledColor: #ffffff;
+}
+
+ComboBox {
+   dropDownStyleName: "myComboBoxDropDowns";
+}
+
+.myComboBoxDropDowns {
+   borderColor: #9caa9d;
+}
+
+/*List {
+	border-style:none;
+	background-color: #9caa9d;
+}*/
+
+.trillrItem {
+	border-style: solid;
+	background-alpha: 1.0;
+	background-color: #FFFFFF;
+	borderThickness: 1;
+}
+
+.openSpaceItem {
+	border-style: solid;
+}
+
+Alert {
+  title-style-name: "alertTitle";
+  message-style-name: "alertMessage";
+  button-style-name: "alertButton";
+  background-color: #9caa9d;
+  border-style: solid;
+}
+
+.alertTitle {
+  color: #000000;
+  font-weight:bold;
+  background-color:#9caa9d;
+}
+
+.alertMessage {
+  color: #000000;
+}
+
+.alertButton {
+  color: #000000;
+}
+.userButton {
+  text-align:center;
+  vertical-align:middle;
+  horizontal-align:center;
+  padding-bottom:0;
+  padding-left:0;
+  padding-right:0;
+  padding-top:0;
+  color:#000000;
+}

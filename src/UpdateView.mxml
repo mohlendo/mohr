@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+  creationComplete="init()"
+  backgroundColor="#9caa9d" xmlns:components="components.*">
+
+  <mx:Metadata>
+    [Event(name="complete", type="flash.events.Event")] 
+  </mx:Metadata>
+  
+  <mx:Script>
+    <![CDATA[
+      import config.Components;
+      import mx.core.Application;
+      
+      private function init():void
+      {
+        URLRequestDefaults.setLoginCredentialsForHost(Application.application.host, 
+                                                      Components.instance.settings.username, 
+                                                      Components.instance.settings.password);
+      }
+      private function update():void
+      {        
+      	if(status.text.length > 0)
+      	{ 
+      	  Components.instance.analyticsTracker.trackEvent("timeline","Update");
+      		updateService.send();      		
+      	}      	
+      }
+      
+      private function complete():void
+      {
+        status.text = '';
+        Components.instance.updateText = ""; 
+        dispatchEvent(new Event(Event.COMPLETE));      
+        Application.application.connectOk();
+        status.errorString = "";
+      }
+      
+      private function enterPressed(event:KeyboardEvent):void
+      {
+        if(event.charCode == 13) {
+          update();
+        }
+      }
+      
+      private function checkLength():void {
+        Components.instance.updateText = status.text;
+        if(status.length > 140) {
+          status.errorString = "Keep your posting short. It should not exceed 140 chars. But if you have to, ok ;-)";
+        } else {
+          status.errorString = "";
+        }
+      }
+     
+    ]]>
+  </mx:Script>
+  
+  <mx:HTTPService id="updateService"
+    showBusyCursor="true"
+    result="complete()"
+    fault="Application.application.connectError()"
+    url="{Application.application.protocol}{Application.application.host}/statuses/update.xml"
+    method="POST">
+    <mx:request xmlns="">
+      <status>{Components.instance.group ? "d "+Components.instance.group.id+" " :""}{status.text}</status>
+      <source>mohr</source>
+    </mx:request>
+  </mx:HTTPService>
+  <mx:HBox width="100%">
+    <mx:Canvas backgroundColor="#FFFFFF" width="100%">
+     <mx:TextArea backgroundAlpha="0.5" backgroundImage="{Components.instance.group.image_url}" width="100%" id="status" change="checkLength()" keyDown="enterPressed(event)" text="{Components.instance.updateText}"/> 
+    </mx:Canvas>
+    <mx:Button label="Update!" click="update()" height="100%"/>
+  </mx:HBox>
+  
+</mx:VBox>

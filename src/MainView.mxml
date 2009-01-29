@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+  width="100%" 
+  height="100%" 
+  creationComplete="init()"
+  xmlns:local="*">
+  <mx:Script>
+    <![CDATA[
+      import mx.events.IndexChangedEvent;
+      import config.Components;
+      import mx.binding.utils.BindingUtils;
+      import mx.core.Application;
+      
+      private function init():void
+      {
+        BindingUtils.bindSetter(changeBlogState,Components.instance.settings,["showCoreMediaBlog"]);
+      }
+      private function changeBlogState(value:Boolean):void
+      {
+        if(value)
+          currentState = "blog";
+        else
+          currentState = "";
+      }
+      private function trackViews(event:IndexChangedEvent):void
+      {
+        Components.instance.analyticsTracker.trackPageview("/"+views.selectedChild.label);        
+      }
+      
+    ]]>
+  </mx:Script>
+  <mx:LinkBar left="0" top="0" dataProvider="{views}" id="linkbar" />
+  <mx:states>
+    <mx:State name="blog">
+      <mx:AddChild relativeTo="{videoView}" position="after">
+        <mx:target>
+          <local:BlogView label="Blog" width="100%" height="100%"/> 
+        </mx:target>
+      </mx:AddChild>
+    </mx:State>
+  </mx:states>
+  <mx:ViewStack
+    id="views"
+    change="trackViews(event)"
+    left="4"
+    right="4"
+    bottom="4"
+    top="25"
+    width="100%"
+    height="100%">
+    <local:TimelineView label="Home" width="100%" height="100%"/>
+    <local:VideoView id="videoView" label="Video" width="100%" height="100%"/>
+    <local:SettingsView label="Settings" width="100%" height="100%"/>    
+    <local:AboutView label="About" width="100%" height="100%"/>
+  </mx:ViewStack>
+
+</mx:Canvas>

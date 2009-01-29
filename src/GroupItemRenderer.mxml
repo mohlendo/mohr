@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%"
+	height="100%"
+	verticalScrollPolicy="off"
+  horizontalScrollPolicy="off"
+  paddingBottom="5"
+  paddingTop="5"
+  paddingLeft="5"
+  paddingRight="5"
+  borderStyle="solid"
+  backgroundColor="#FFFFFF"
+  toolTip="{data.topic}">
+		
+	<mx:Script>
+		<![CDATA[
+			import util.ParseUtils;
+			import mx.core.Application;
+
+		]]>
+	</mx:Script>
+	<mx:HBox horizontalGap="0">
+	  <mx:Image id="img" 
+	   source="{data.image_url}"
+	   height="32"
+	   width="32"
+	   verticalAlign="middle"
+	   horizontalAlign="center"
+	   autoLoad="true"
+	   cacheAsBitmap="true"
+	   cachePolicy="on"/>
+	  <mx:Label color="#0099ff" fontSize="12" fontWeight="bold" text="{data.topic} ({data.id})" width="100%"/>	
+	</mx:HBox>
+	<mx:HBox horizontalGap="0">
+		<mx:Image source="@Embed('assets/location.png')"/>
+		<mx:Label color="#0099ff" text="{data.location}" width="100%"/>	
+	</mx:HBox>
+	<!--mx:VBox width="100%" verticalGap="0">
+    <mx:Text id="mainText" width="100%" condenseWhite="true" doubleClickEnabled="false"
+      htmlText="&lt;b&gt;&lt;font color='#0099ff'&gt;{data.status.user.screen_name}&lt;/font&gt;&lt;/b&gt; {data.status.text}"/>
+    <mx:Text text="{data.status.user.name}, {ParseUtils.calcInterval(data.status.created_at)} via {data.status.source}" color="#0099ff"  fontSize="8"/>
+  </mx:VBox-->
+	
+</mx:VBox>

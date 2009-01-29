@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+  xmlns:view="com.coremedia.ctv.admin.view.*"
+  hide="stop()"
+  clipContent="true"
+  rollOver="showControls()"
+  rollOut="hideControls()"
+  removedFromStage="stop()"
+  creationComplete="init()">
+  <mx:Script>
+    <![CDATA[
+      import mx.controls.videoClasses.VideoError;
+      import mx.formatters.SwitchSymbolFormatter;
+      import mx.events.VideoEvent;
+      import mx.binding.utils.BindingUtils;
+      import mx.effects.easing.Elastic;
+      import mx.core.UIComponent;
+            
+      [Bindable]
+      public var videoUrl:String;
+      
+      [Bindable]
+      public var autoPlay:Boolean;
+      
+      [Embed(source="/assets/activity.swf")]
+      [Bindable] private var activity:Class;
+      
+      private function init():void
+      {
+        player.addEventListener(VideoEvent.STATE_CHANGE,handleVideoStateChange);       
+      }     
+      
+      private function handleVideoStateChange(event:VideoEvent):void
+      {
+        switch(event.state) {
+          case VideoEvent.BUFFERING:
+            currentState = "loading";
+            if(player.playing)
+              player.pause();
+          break;
+          case VideoEvent.LOADING:
+            currentState = "loading";
+            if(player.playing)
+              player.pause();
+          break;
+          case VideoEvent.COMPLETE:
+            currentState = "";
+            if(!player.playing)
+              player.play();
+          break;
+          case VideoEvent.READY:
+            currentState = "";
+            if(!player.playing)
+              player.play();
+          break;
+          case VideoEvent.STATE_CHANGE:
+            currentState = "";
+            if(!player.playing)
+              player.play();
+          break;
+          case VideoEvent.PLAYING:
+            currentState = "";
+          break;
+        }
+      }
+      
+      public function play():void
+      {
+        this.player.play();
+      }
+      public function stop():void
+      {
+        if(player && player.playing)
+          player.stop();
+
+      }
+
+      private function showControls():void
+      {
+        fadeIn.play([controls]);
+        time.visible = true;
+        
+      }
+
+      private function hideControls():void
+      {
+        fadeOut.play([controls]);
+        time.visible = false;
+        
+      }
+
+      private function playheadUpdate(evt:VideoEvent):void
+      {
+        var pTime:Date = new Date(player.playheadTime * 1000 || 100);
+        var tTime:String = "0:20";
+        if(player.totalTime > -1)
+          tTime = dateFormatter.format(new Date(player.totalTime * 1000));
+        time.text = dateFormatter.format(pTime) + " / " + tTime;
+        
+      }
+
+      private function pausePlay():void
+      {
+        if(player.playing)
+        {
+          player.pause();
+        }
+        else
+        {
+          player.play();
+        }
+      }
+
+      private function setVideoOffset(offset:Number):void
+      {
+        player.playheadTime = offset;
+      }
+      
+      public function toggleLoading():void 
+      {
+        if(currentState != "loading") {          
+          currentState = "loading";
+        }else {
+          currentState = "";
+        }                
+      }
+
+
+    ]]>
+  </mx:Script>
+
+  <mx:states>    
+    <mx:State name="loading">
+      <mx:AddChild relativeTo="{this}">
+        <mx:Box height="100%" width="100%" horizontalAlign="center" verticalAlign="middle">
+          <mx:Image width="80" height="80" source="{activity}"/>        
+        </mx:Box>
+      </mx:AddChild>
+    </mx:State>
+  </mx:states>
+
+  <mx:DateFormatter id="dateFormatter" formatString="NN:SS" />
+
+  <mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" />
+  <mx:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" />
+
+  <mx:VideoDisplay
+          id="player"
+          source="{videoUrl}"
+          autoPlay="{autoPlay}"
+          ready="player.visible = true"
+          playheadUpdate="playheadUpdate(event)"
+          autoRewind="true"
+          width="100%"
+          height="100%"
+          x="0"
+          y="0"/>
+  <mx:HBox id="controls"
+    backgroundColor="#000000"
+    backgroundAlpha="0.5"
+    horizontalAlign="center"
+    verticalAlign="middle"
+    paddingLeft="12"
+    paddingRight="5"
+    height="20"
+    alpha="0.0"
+    width="100%"
+    horizontalCenter="0"
+    bottom="20">
+    <mx:Button id="playPauseButton" height="18" width="18" toolTip="Play/Pause" skin="skin.PlayPauseButtonSkin" toggle="true" selected="{player.playing}" click="pausePlay()" />
+    <mx:Spacer width="8"/>
+    <mx:Button id="stopButton" toolTip="Stop" height="18" width="18" skin="skin.StopButtonSkin" click="stop()"/>
+    <mx:Spacer width="100%"/>
+    <mx:Label id="time" width="100" color="#FFFFFF" />
+  </mx:HBox>
+
+</mx:Canvas>

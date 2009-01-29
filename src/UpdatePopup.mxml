@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
+  layout="absolute"
+  title="New software version available"
+  systemChrome="none"
+  transparent="true"
+  maximizable="false"
+  minimizable="false"
+  width="400"
+  height="200"
+  type="utility"
+  showStatusBar="false"
+  showTitleBar="true"
+  showGripper="true"
+  creationComplete="init()">
+
+    <mx:Script>
+      <![CDATA[
+        import config.Components;
+        import mx.core.Application;
+        import mx.managers.PopUpManager;
+
+        public var updateUrl:String = Application.application.baseUrl + "/apps/mohr";
+
+        [Bindable]
+        public var version:String;
+
+        private function init():void
+        {
+          txt.htmlText = "<p>There is a new version ("+version+") of the <b>mohr</b> available.</p><p>Please update your installation or go to <b><a href='"+updateUrl+"'>"+updateUrl+"</a></b></p>";
+        }
+
+        private function cancel():void
+        {
+         Components.instance.updateController.cancelUpdate();
+        }
+        private function update():void
+        {
+          Components.instance.updateController.update();
+        }
+      ]]>
+    </mx:Script>
+  <mx:Text id="txt"
+    selectable="false"
+    top="12"
+    bottom="12"
+    left="12"
+    right="12"/>
+  <mx:Button label="Update" left="12" bottom="2" click="update()"/>  
+</mx:Window>

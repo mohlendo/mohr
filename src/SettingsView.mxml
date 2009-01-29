@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"   
+  verticalScrollPolicy="off"
+  horizontalScrollPolicy="off">
+  <mx:Script>
+    <![CDATA[
+      import config.Components;
+      import mx.core.Application;
+      
+    ]]>
+  </mx:Script>
+  <mx:VBox top="24" left="4" width="100%">
+    <mx:HBox  toolTip="Start on loggin">
+      <mx:Label text="Start on loggin" fontWeight="bold"/>
+      <mx:CheckBox id="startOnLoggin" selected="{Components.instance.settings.startOnLoggin}" change="Components.instance.settings.startOnLoggin = startOnLoggin.selected"/>   
+    </mx:HBox>  
+    <mx:Text condenseWhite="true" width="100%">
+     <mx:htmlText>
+       <![CDATA[
+         <p>This enables mohr to start when you start your machine.</p>
+       ]]>
+     </mx:htmlText>
+    </mx:Text> 
+    <mx:HBox  toolTip="Show CoreMedia Blog">
+      <mx:Label text="Show CoreMedia Blog" fontWeight="bold"/>
+      <mx:CheckBox id="showCoreMediaBlog" selected="{Components.instance.settings.showCoreMediaBlog}" change="Components.instance.settings.showCoreMediaBlog = showCoreMediaBlog.selected"/>   
+    </mx:HBox>  
+    <mx:Text condenseWhite="true" width="100%">
+     <mx:htmlText>
+       <![CDATA[
+         <p>Show the latest CoreMedia Blog entries.</p>
+       ]]>
+     </mx:htmlText>
+    </mx:Text>
+   <mx:Spacer height="24"/>
+   <mx:HBox  toolTip="Mähhhh! You cannot disable sound ;-)">
+      <mx:Label text="Sound notification" fontWeight="bold"/>
+      <mx:VBox>
+        <mx:ComboBox 
+          id="sound" 
+          dataProvider="{Components.instance.sounds}" 
+          selectedIndex="{Components.instance.settings.notificationSoundIndex}"
+          change="Components.instance.settings.notificationSoundIndex = sound.selectedIndex"/>
+      </mx:VBox>
+    </mx:HBox>
+  </mx:VBox>
+  
+</mx:Canvas>

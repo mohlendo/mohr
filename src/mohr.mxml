@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication
+  xmlns:mx="http://www.adobe.com/2006/mxml"
+  layout="absolute"
+  showGripper="true"
+  showStatusBar="true"
+  creationComplete="initApplication()"
+  title="mohr {version} - What's On Your Mind?"
+  titleIcon="@Embed('/assets/trillR_16x16_windowIcon.png')"
+  status="connected to {protocol}{host} {Components.instance.settings.username ? 'as ' + Components.instance.settings.username : ''}"
+  xmlns:local="*"
+  xmlns:components="components.*" xmlns:config="config.*">
+	
+	<mx:Style source="/styles.css"/>
+  	<mx:Script>
+	    <![CDATA[
+	      import config.Components;
+	      import components.Status;
+	      import mx.controls.Image;
+	      import mx.events.ResizeEvent;
+        import mx.controls.Alert;
+        import mx.events.CloseEvent;
+        
+        [Bindable]
+        [Embed(source="assets/trillR_16x16_windowIcon.png")]
+        private var DockIcon:Class;
+      
+        private var dockImage:BitmapData;
+	      
+	      [Bindable]
+	      public var protocol:String = "http://";
+	
+	      [Bindable]
+	      public var host:String = "trillr.coremedia.com";//"mock/";//  
+	          	      
+	      [Bindable]
+	      public var error:String;
+	      
+	      [Bindable]
+        public var version:String;
+        
+        public function get baseUrl():String
+        {
+          return protocol + host;
+        }     
+                      
+	      public function initApplication():void 
+	      {   
+	        var descriptor:XML = NativeApplication.nativeApplication.applicationDescriptor;
+          var ns:Namespace = descriptor.namespaceDeclarations()[0];
+          version = descriptor.ns::version;    
+        
+	        try 
+	        {
+	          NativeApplication.nativeApplication.startAtLogin = Components.instance.settings.startOnLoggin;
+	        } catch (e:Error) {
+	          trace(e);
+	        }
+	        
+	        Components.instance.updateController.updateRequired();        
+	        
+	        dockImage = new DockIcon().bitmapData;
+          if (NativeApplication.supportsSystemTrayIcon)
+          {
+             setSystemTrayProperties();             
+             //Set some systray menu options, so that the user can right-click and access functionality          
+             //without needing to open the application          
+             SystemTrayIcon(NativeApplication.nativeApplication.icon).menu = createSystrayRootMenu();
+             this.addEventListener(Event.CLOSING, closingApplication);
+          }
+          
+          Components.instance.analyticsTracker.trackEvent("mohr","Start");          
+        }
+        
+        private function closingApplication(evt:Event):void {
+          //Don't close, so prevent the event from happening
+          evt.preventDefault();
+          
+          //Check what the user really want's to do       //Alert.buttonWidth = 110;
+          Alert.yesLabel = "Close";
+          Alert.noLabel = "Minimize";
+          Alert.show("Close or minimize?", "Close?", 3, this, alertCloseHandler);
+        }
+        
+        private function alertCloseHandler(event:CloseEvent):void {
+          if (event.detail==Alert.YES) {
+            closeApp(event);
+          } else {
+            dock();
+          }
+        }
+        
+    
+       /**
+       * Create a menu that can be accessed from the systray
+       *
+       * @Author: S.Radovanovic
+       */
+       private function createSystrayRootMenu():NativeMenu
+       {
+          //Add the menuitems with the corresponding actions
+          var menu:NativeMenu = new NativeMenu();
+          var openNativeMenuItem:NativeMenuItem = new NativeMenuItem("Open");
+          var exitNativeMenuItem:NativeMenuItem = new NativeMenuItem("Exit");
+    
+          //What should happen when the user clicks on something...       
+    
+          openNativeMenuItem.addEventListener(Event.SELECT, undock);
+    
+          exitNativeMenuItem.addEventListener(Event.SELECT, closeApp);
+    
+          //Add the menuitems to the menu
+          menu.addItem(openNativeMenuItem);
+          menu.addItem(new NativeMenuItem("",true));
+          //separator
+          menu.addItem(exitNativeMenuItem);
+          
+          return menu;
+       }
+    
+       /**
+       * To be able to dock and undock we need to set some eventlisteners
+       *
+       * @Author: S.Radovanovic
+       */
+       private function setSystemTrayProperties():void
+       {
+          //Text to show when hovering of the docked application icon       
+          SystemTrayIcon(NativeApplication.nativeApplication .icon).tooltip = "trillr - What's On Your Mind?";
+          
+          //We want to be able to open the application after it has been docked       
+          SystemTrayIcon(NativeApplication.nativeApplication .icon).addEventListener(MouseEvent.CLICK, undock);
+          
+          //Listen to the display state changing of the window, so that we can catch the minimize       
+          this.nativeWindow.addEventListener(NativeWindowDisplayStateEvent.DISPLAY_STATE_CHANGING, nwMinimized); //Catch the minimize event
+       }
+    
+       /**
+       * Do the appropriate actions after the windows display state has changed.
+       * E.g. dock when the user clicks on minize
+       *
+       * @Author: S.Radovanovic
+       */
+       private function nwMinimized(displayStateEvent:NativeWindowDisplayStateEvent):void 
+       {
+       
+          //Do we have an minimize action?       
+          //The afterDisplayState hasn't happened yet, but only describes the state the window will go to,       
+          //so we can prevent it!
+          if(displayStateEvent.afterDisplayState == NativeWindowDisplayState.MINIMIZED) 
+          {
+             //Prevent the windowedapplication minimize action from happening and implement our own minimize          //The reason the windowedapplication minimize action is caught, is that if active we're not able to          //undock the application back neatly. The application doesn't become visible directly, but only after clicking          //on the taskbars application link. (Not sure yet what happens exactly with standard minimize)
+             displayStateEvent.preventDefault();
+             
+             //Dock (our own minimize)
+             dock();
+          }
+       }
+    
+       /**
+       * Do our own 'minimize' by docking the application to the systray (showing the application icon in the systray)
+       *
+       * @Author: S.Radovanovic
+       */
+       public function dock():void 
+       {
+          //Hide the applcation
+          stage.nativeWindow.visible = false;
+          this.dispatchEvent(new Event("dock"));
+          
+          //Setting the bitmaps array will show the application icon in the systray
+          NativeApplication.nativeApplication .icon.bitmaps = [dockImage];
+       }
+    
+       /**
+       * Show the application again and remove the application icon from the systray
+       *
+       * @Author: S.Radovanovic
+       */
+       public function undock(evt:Event):void 
+       {
+          //After setting the window to visible, make sure that the application is ordered to the front,       //else we'll still need to click on the application on the taskbar to make it visible
+          stage.nativeWindow.visible = true;
+          this.dispatchEvent(new Event("undock"));
+          stage.nativeWindow.orderToFront();
+          
+          //Clearing the bitmaps array also clears the applcation icon from the systray
+          NativeApplication.nativeApplication .icon.bitmaps = [];
+       }
+    
+    
+       /**
+       * Close the application
+       *
+       * @Author: S.Radovanovic
+       */
+       private function closeApp(evt:Event):void 
+       {
+          Components.instance.analyticsTracker.trackEvent("mohr","Stop");  
+          stage.nativeWindow.close();
+       }
+       
+       public function connectError():void
+       {
+         error = "error";
+       } 
+       
+       public function connectOk():void
+       {
+         error = "";
+       }       
+       
+       	
+	    ]]>
+  	</mx:Script>
+
+	<mx:states>
+  	<mx:State name="loggedIn">
+  	  <mx:RemoveChild target="{loginView}"/>
+  	  <mx:AddChild>
+  	    <local:MainView width="100%" height="100%"/>
+  	  </mx:AddChild>
+  	</mx:State>
+	</mx:states>
+	
+	<config:MohrComponents id="config"/>
+
+  <local:LoginView id="loginView" width="100%" height="100%"/>
+  
+  <mx:statusBarFactory>
+    <mx:Component>            
+      <mx:HBox>
+        <mx:Script>
+          <![CDATA[
+            import mx.core.Application;
+            [Bindable]
+            public var status:String;            
+          ]]>
+        </mx:Script>
+        <mx:Text id="statusTxt" text="{status}" selectable="false"/>
+        <mx:Spacer width="100%"/>
+        <mx:Text id="errorTxt" 
+          text="{Application.application.error}" 
+          selectable="false" 
+          paddingRight="12" 
+          color="red"/>
+      </mx:HBox>      
+    </mx:Component>
+  </mx:statusBarFactory>
+    
+</mx:WindowedApplication>

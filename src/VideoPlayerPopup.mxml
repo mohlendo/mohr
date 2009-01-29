@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute"
+  title="Video"
+  initialize="init()"
+  systemChrome="none"
+  transparent="true"
+  maximizable="false"
+  minimizable="false"
+  resizable="false"
+  type="utility"
+  width="325"
+  height="275"
+  close="handleClose(event)"
+  hide="handleClose(event)"
+  showStatusBar="false"
+  showTitleBar="true"
+  showGripper="false" 
+  xmlns:local="*">
+  
+  <mx:Script>
+    <![CDATA[
+      import mx.core.Application;
+      [Bindable]
+      private var _videoUrl:String;
+      
+      private var vidLoader:URLLoader;
+      private var videoID:String;
+      private var vidRequest:URLRequest;
+      
+      private function init():void
+      {
+        Application.application.addEventListener("dock",handleDock);
+      }
+      
+      private function handleDock(e:Event):void
+      {
+        this.close();
+      }
+    
+      private function handleClose(e:Event):void
+      {
+        player.stop();
+        if(vidLoader)
+        {
+          vidLoader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS,onVidRequestLoad);
+          vidLoader.close();
+        }        
+      }
+      
+      public function set videoUrl(value:String):void
+      {
+             
+        if(value.indexOf("youtube") != -1) {
+          //player.toggleLoading();
+          var vidURL:String = normalizeURL(value);
+          var vidRequest:URLRequest = new URLRequest(vidURL);
+          vidRequest.followRedirects = false;
+          vidLoader = new URLLoader();
+          vidLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS,onVidRequestLoad);
+          vidLoader.load(vidRequest);
+        }else {
+          _videoUrl = value;   
+          dispatchEvent(new Event("videoUrlChanged"));
+        }    
+      }
+      
+      [Bindable(event="videoUrlChanged")]
+      public function get videoUrl():String
+      {
+        return _videoUrl;
+      }
+      
+      private function onVidRequestLoad(evt:HTTPStatusEvent):void
+      {
+        for each(var reqHeader:URLRequestHeader in evt.responseHeaders)
+        {
+          if (reqHeader.name == "Location") {
+            var vars:URLVariables = new URLVariables();
+            vars.decode(reqHeader.value.split("?")[1]);
+            videoID = vars.video_id;
+            _videoUrl = constructFLVURL(vars.video_id, vars.t);
+            trace(_videoUrl);
+            dispatchEvent(new Event("videoUrlChanged"));
+            player.play();
+          }
+        }        
+        
+      }
+      private function constructFLVURL(video_id:String, t:String):String
+      {
+        var tmp:String = "http://www.youtube.com/get_video.php?";
+        tmp += "video_id="+video_id;
+        tmp += "&t="+t;
+        return tmp;
+      }
+      
+      private function normalizeURL(URL:String):String
+      {
+        var tmp:String = URL;
+        tmp = tmp.split("watch?v=").join("v/");
+        return tmp;
+      }
+ 
+      
+    ]]>
+  </mx:Script>
+  
+  <local:VideoPlayer id="player" width="320" height="240" videoUrl="{videoUrl}" autoPlay="true"/>
+  
+</mx:Window>

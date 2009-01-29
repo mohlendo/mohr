@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+  creationComplete="init()"
+  width="100%"
+  height="100%"
+  xmlns:qs="qs.controls.*"
+  xmlns:local="*" >
+
+  <mx:Script>
+    <![CDATA[
+      import components.Notification;
+      import mx.controls.Alert;
+      import config.Components;
+      import mx.core.Window;
+      import com.adobe.viewsource.ViewSource;
+      import mx.core.Application;
+      import mx.rpc.events.ResultEvent;
+      import flash.system.Capabilities;
+
+      private var timer:Timer;
+      private var lastScrollPostion:Number = 0;
+            
+      private function init():void
+      {                
+        URLRequestDefaults.setLoginCredentialsForHost(Application.application.host, 
+                                                      Components.instance.settings.username, 
+                                                      Components.instance.settings.password);
+        timeLineService.send();
+        timer = new Timer(60000);
+        timer.addEventListener(TimerEvent.TIMER,loadData);
+        timer.start();
+        groupService.send();
+      }
+     
+      private function loadData(e:Event):void
+      {
+      	lastScrollPostion = timeline.verticalScrollPosition;
+        timeLineService.send();
+      }
+      
+      private function complete():void
+      {
+        timeline.verticalScrollPosition = lastScrollPostion;     
+        var lastResult:SharedObject = SharedObject.getLocal("lastResult");
+      	if(lastResult.data.id && lastResult.data.id !=  timeLineService.lastResult.statuses.status[0].id) 
+      	{
+      	  Notification.instance.newMessage(timeLineService.lastResult.statuses.status[0]);
+          
+        }
+        lastResult.data.id = timeLineService.lastResult.statuses.status[0].id;
+        lastResult.flush();
+        Application.application.connectOk();  
+      }
+      
+      
+      private function groupServiceComplete():void{
+                        
+        Application.application.connectOk();           
+      }
+      
+      private function loadGroupData():void
+      {
+        Components.instance.analyticsTracker.trackEvent("timeline","Select group","(" + view.selectedItem.id+") " + view.selectedItem.topic); 
+        Components.instance.group = view.selectedItem;
+        lastScrollPostion = 0;
+        timeLineService.url = Application.application.protocol+Application.application.host+"/statuses/gatherings_timeline/"+view.selectedItem.id+".xml";
+        timeLineService.send();             
+      }
+      
+      private function laodTimeline():void
+      {
+        Components.instance.analyticsTracker.trackEvent("timeline","Friends");
+        view.selectedItem = -1;
+        lastScrollPostion = 0;
+        Components.instance.group = null;
+        timeLineService.url = Application.application.protocol+Application.application.host+"/statuses/friends_timeline.xml";
+        timeLineService.send();
+        groupService.send();
+        
+      }
+
+    ]]>
+  </mx:Script>
+
+  <mx:HTTPService id="timeLineService" 
+  	url="{Application.application.protocol}{Application.application.host}/statuses/friends_timeline.xml"
+  	result="complete()"
+  	showBusyCursor="true"
+  	fault="Application.application.connectError()" />
+  	
+ <mx:HTTPService id="groupService" 
+		result="groupServiceComplete()"
+		fault="Application.application.connectError()"
+		url="{Application.application.protocol}{Application.application.host}/statuses/gatherings.xml" />
+  
+  <mx:Canvas
+     id="timeline"
+     top="0" 
+     left="0"
+     right="0"
+     bottom="80"
+     width="100%"
+     height="100%"     
+     verticalScrollPolicy="on"
+     horizontalScrollPolicy="off">
+    <mx:VBox width="100%" id="rpBox">      
+      <mx:Repeater id="rp" dataProvider="{timeLineService.lastResult.statuses.status}" recycleChildren="true">
+        <local:TrillrItemRenderer data="{rp.currentItem}"/>
+      </mx:Repeater>     
+    </mx:VBox>     
+  </mx:Canvas>
+  
+  <mx:HBox id="groupView"
+    left="0"
+    right="0"
+    bottom="{updateView.height+4}">
+    <mx:ComboBox id="view" 
+      dataProvider="{groupService.lastResult.gatherings.gathering}" 
+      itemRenderer="GroupItemRenderer" 
+      change="loadGroupData()"
+      open="Components.instance.analyticsTracker.trackEvent('timeline','Show groups');"
+      labelField="topic" 
+      prompt="Please select a Group..." 
+      width="100%">
+    </mx:ComboBox>
+    <mx:Button label="Friends" click="laodTimeline()"/> 
+  </mx:HBox>
+  <local:UpdateView id="updateView" 
+    left="0"
+    right="0"
+    bottom="0"
+    complete="loadData(event)"  
+    verticalGap="4"/>
+  
+</mx:Canvas>

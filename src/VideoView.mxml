@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="300" hide="removeWebcamVideo()">
+  <mx:Script>
+    <![CDATA[
+      import flash.utils.setInterval;
+      import mx.controls.Text;
+      import mx.controls.Alert;
+      import mx.core.Application;
+      import mx.core.UIComponent;
+
+      private var video:Video;
+      private var videoHolder:UIComponent;
+      private var camera:Camera;
+      private var microphon:Microphone;
+      
+      private var connection:NetConnection;
+      private var stream:NetStream;
+      
+      [Bindable]
+      private var filename:String;
+      
+      private var timer:Timer;
+      
+      private var recording:Boolean = false;           
+     
+      public function insertWebcamVideo():void{
+        videoHolder = new UIComponent();
+        enable_btn.enabled = false;
+        camera = Camera.getCamera();
+        microphon = Microphone.getMicrophone();
+        if(camera && microphon) {
+          video = new Video(camera.width*2, camera.height*2);
+          video.attachCamera(camera);
+          videoHolder.addChild(video);
+          box.addChild(videoHolder);
+          record_btn.enabled = true;
+        } else {
+          var text:Text = new Text();
+          text.condenseWhite = true;
+          text.htmlText = "<b>You have to have a webcam/microphone installed and enabled!</b>"
+          box.addChild(text);
+        }
+      
+    } 
+    
+    public function removeWebcamVideo():void
+    {
+        if(stream)
+          stream.close();
+          
+        if(connection)
+          connection.close();
+        
+        video = null;
+        if(videoHolder) {
+          box.removeChild(videoHolder);
+          videoHolder = null;
+        } 
+        record_btn.enabled = false;
+        enable_btn.enabled = true;
+            
+    }
+    
+    public function recordPushed():void
+    {
+      if(!recording) {
+        if(!connection || !connection.connected)
+        {
+          filename = Application.application.username+(new Date().getTime())+".flv"
+          connection = new NetConnection();
+          connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+          connection.connect("rtmp://"+Application.application.host+":1935");
+          connection.objectEncoding = ObjectEncoding.AMF0; 
+              
+         }
+         record_btn.label = "Stop and Update!";
+      } else {
+        stopRecordingAndSend(null);   
+      }
+    }
+    
+    private function stopRecordingAndSend(event:TimerEvent):void {
+      if(stream){
+          stream.close();
+      }
+      connection.close();
+      record_btn.enabled = true; 
+      updateService.send();
+      timer.stop();
+      recording = false;
+      record_btn.label = "Record and Update!";
+    }
+    private function netStatusHandler(event:NetStatusEvent):void {
+            switch (event.info.code) {
+                case "NetConnection.Connect.Success":
+                    connectStream();
+                    break;  
+                case "NetConnection.Connect.Failed":
+                    Application.application.connectError();
+                    record_btn.label = "Record and Update!";
+                    recording = false;
+                    if(stream)
+                      stream.close();
+                      connection.close();
+                    break;              
+            }
+        }
+
+    private function connectStream():void {
+      recording = true;
+      stream = new NetStream(connection);
+      timer = new Timer(20000,1);
+      timer.addEventListener(TimerEvent.TIMER_COMPLETE,stopRecordingAndSend);
+      stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+      stream.attachAudio(microphon);
+      stream.attachCamera(camera);
+      timer.start();
+      stream.publish(filename);
+    }
+
+    
+    ]]>
+  </mx:Script>
+  <mx:HTTPService id="updateService"
+    showBusyCursor="true"
+    fault="Application.application.connectError()"
+    url="{Application.application.protocol}{Application.application.host}/statuses/update.xml"
+    method="POST">
+    <mx:request xmlns="">
+      <status>#video {Application.application.protocol}{Application.application.host}/static/videos/{filename} You need the new mohr version in order to see this video.</status>
+      <source>mohr</source>
+    </mx:request>
+  </mx:HTTPService>
+  
+  <mx:VBox id="box" width="100%" horizontalAlign="left" left="5" top="5" verticalGap="10">
+    <mx:Text width="100%" condenseWhite="true">
+      <mx:htmlText>
+        <![CDATA[
+          <p>This is the experimental video feature. Instead of sending text trills you can send video trills!</p>
+          <p>Just press the record button and tell the world what is on your mind. I you not stop, the recording stops after 20 sec. and the video trill goes online!</p>
+        ]]>
+      </mx:htmlText>
+    </mx:Text>
+    <mx:Button id="enable_btn" click="insertWebcamVideo()" label="Enable WebCam"/>
+  </mx:VBox>
+  <mx:Button id="record_btn" left="5" bottom="5" enabled="false" label="Record and Update!" click="recordPushed()" /> 
+</mx:Canvas>

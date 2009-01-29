@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+  creationComplete="init()"
+  width="100%"
+  height="100%">
+
+  <mx:Script>
+    <![CDATA[
+      import config.Components;
+      import mx.events.ValidationResultEvent;
+      import mx.validators.ValidationResult;
+      import mx.rpc.events.FaultEvent;
+      import mx.core.Application;
+
+      private function init():void
+      {
+        if(Components.instance.settings.autoLogin) {
+          logIn();
+        }
+      }
+
+      private function handleError(e:FaultEvent):void
+      {
+        error.text = "login failed";
+      }
+
+      private function handleResult():void
+      {
+        Application.application.currentState = "loggedIn";
+      }
+      private function logIn():void
+      {
+        if(nameV.validate().type == ValidationResultEvent.VALID && passV.validate().type == ValidationResultEvent.VALID)
+        { 
+          Components.instance.settings.username = username.text;
+          Components.instance.settings.password = password.text;
+          
+          URLRequestDefaults.setLoginCredentialsForHost(Application.application.host,Components.instance.settings.username,Components.instance.settings.password);
+          loginService.send();
+        }
+      }
+
+    ]]>
+  </mx:Script>
+  <mx:StringValidator id="nameV" source="{username}"
+    property="text" required="true" />
+  <mx:StringValidator id="passV" source="{password}"
+    property="text" required="true"/>
+
+  <mx:HTTPService id="loginService"
+    url="{Application.application.protocol}{Application.application.host}/account/verify_credentials.xml"
+    result="handleResult()"
+    fault="handleError(event)">
+  </mx:HTTPService>
+
+  <mx:Form defaultButton="{loginBtn}" verticalGap="12">
+    <mx:FormHeading label="Login" fontSize="18"/>
+    <mx:FormItem label="Name:" >
+      <mx:TextInput id="username" text="{Components.instance.settings.username}" />
+    </mx:FormItem>
+
+    <mx:FormItem label="Password:">
+      <mx:TextInput id="password" text="{Components.instance.settings.password}" displayAsPassword="true"/>
+    </mx:FormItem>
+
+    <mx:FormItem label="Auto Login:">
+      <mx:CheckBox id="autoLogin" selected="{Components.instance.settings.autoLogin}" change="Components.instance.settings.autoLogin = autoLogin.selected"/>
+    </mx:FormItem>
+
+    <mx:FormItem>
+      <mx:Button id="loginBtn" label="Login" click="logIn()" />
+    </mx:FormItem>
+    <mx:FormItem>
+      <mx:Label id="error" color="red"/>
+    </mx:FormItem>
+  </mx:Form>
+</mx:Canvas>
