@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" 
+  mouseDown="moveWindow(event)" 
+  width="100%"
+  paddingTop="5"
+  paddingLeft="5"
+  paddingRight="5">
+  <mx:Script>
+    <![CDATA[
+      import mx.managers.PopUpManager;
+      import mx.core.Application;
+      import config.Components;
+      
+      [Bindable]
+      public var title:String;
+      
+      [Bindable]
+      public var titleIcon:Class;
+      
+      private function moveWindow(event:MouseEvent):void {  
+        this.stage.nativeWindow.startMove();              
+      } 
+      private function minimizeApp():void {  
+       Application.application.minimize();
+      } 
+      private function closeApp():void {
+          Application.application.close();
+      }
+      private function openSettings():void {
+        
+        var popup:SettingsView = new SettingsView();
+        
+        PopUpManager.addPopUp(popup,Application.application.root,true);
+        PopUpManager.centerPopUp(popup)   
+      }      
+    ]]>
+  </mx:Script>   
+  <mx:Image data="{titleIcon}"/>
+  <mx:Label text="{title}"/>
+  <mx:Spacer width="100%"/>
+  <mx:Button styleName="settings" toolTip="Settings" click="openSettings()" height="15" width="15"/>         
+  <mx:Button skin="mx.skins.halo.WindowMinimizeButtonSkin" height="100%" toolTip="Minimize to tray" click="minimizeApp()"/>
+  <mx:Button skin="mx.skins.halo.WindowCloseButtonSkin" toolTip="Close" click="closeApp()"/>       
+</mx:HBox>  
+
