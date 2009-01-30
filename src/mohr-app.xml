@@ -24,7 +24,7 @@
 	<name>mohr</name>
 
 	<!-- An application version designator (such as "v1", "2.5", or "Alpha 1"). Required. -->
-	<version>build 28</version>
+	<version>build 29</version>
 
 	<!-- Description, displayed in the AIR application installer. Optional. -->
 	<description>The first official trillr client.</description>

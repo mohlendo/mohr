@@ -32,7 +32,7 @@
   <mx:LinkBar left="0" top="0" dataProvider="{views}" id="linkbar" />
   <mx:states>
     <mx:State name="blog">
-      <mx:AddChild relativeTo="{videoView}" position="after">
+      <mx:AddChild relativeTo="{home}" position="after">
         <mx:target>
           <local:BlogView label="Blog" width="100%" height="100%"/> 
         </mx:target>
@@ -48,9 +48,7 @@
     top="25"
     width="100%"
     height="100%">
-    <local:TimelineView label="Home" width="100%" height="100%"/>
-    <local:VideoView id="videoView" label="Video" width="100%" height="100%"/>
-    <local:SettingsView label="Settings" width="100%" height="100%"/>    
+    <local:TimelineView label="Home" id="home" width="100%" height="100%"/>    
     <local:AboutView label="About" width="100%" height="100%"/>
   </mx:ViewStack>
 

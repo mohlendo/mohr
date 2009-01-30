@@ -6,7 +6,6 @@ package util
 	{
 	  private static const urlPattern:RegExp = /(http[s]?:\/\/[^\s]+)(\s?)/g
 	  
-	  private static const videoPattern:RegExp = /#video/g
 	  
 	  //Tue Aug 05 11:09:41 +0000 2008
 		public static function calcInterval(value:String):String
@@ -33,15 +32,6 @@ package util
 	  public static function formatText(value:String):String
 	  {
 	    return value.replace(urlPattern,"<font color=\"#0099ff\"><a href=\"$1\">$1</a></font>$2");
-	  }
-	  
-	  public static function getVideoUrl(value:String):String
-	  {
-	    if(value.search(videoPattern) != -1) {
-	      return value.match(urlPattern)[0];
-	    }
-	    return null;
-	  }
-	  
+	  }	  
 	}
 }

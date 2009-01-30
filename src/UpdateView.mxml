@@ -11,7 +11,7 @@
     <![CDATA[
       import config.Components;
       import mx.core.Application;
-      
+     
       private function init():void
       {
         URLRequestDefaults.setLoginCredentialsForHost(Application.application.host, 
@@ -68,7 +68,11 @@
   </mx:HTTPService>
   <mx:HBox width="100%">
     <mx:Canvas backgroundColor="#FFFFFF" width="100%">
-     <mx:TextArea backgroundAlpha="0.5" backgroundImage="{Components.instance.group.image_url}" width="100%" id="status" change="checkLength()" keyDown="enterPressed(event)" text="{Components.instance.updateText}"/> 
+     <mx:TextArea backgroundAlpha="0.5" backgroundImage="{Components.instance.group.image_url}" 
+       width="100%" id="status" 
+       change="checkLength()" 
+       keyDown="enterPressed(event)" 
+       text="{Components.instance.updateText}"/> 
     </mx:Canvas>
     <mx:Button label="Update!" click="update()" height="100%"/>
   </mx:HBox>

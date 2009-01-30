@@ -1,18 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"   
   verticalScrollPolicy="off"
-  horizontalScrollPolicy="off">
+  horizontalScrollPolicy="off"
+  width="80%"
+  height="50%"
+  borderStyle="solid"
+  cornerRadius="20"
+  dropShadowEnabled="true"  
+  backgroundColor="#000000"
+  color="#FFFFFF">
   <mx:Script>
     <![CDATA[
+      import mx.events.ValidationResultEvent;
+      import mx.rpc.events.FaultEvent;
+      import mx.managers.PopUpManager;
       import config.Components;
       import mx.core.Application;
       
+      private function handleError(e:FaultEvent):void {
+        error.text = "login failed";
+      }
+      private function handleResult():void {
+        Application.application.connectOk();
+        PopUpManager.removePopUp(this)   
+      }
+      
+      private function save():void {
+        if(nameV.validate().type == ValidationResultEvent.VALID && passV.validate().type == ValidationResultEvent.VALID) { 
+          Components.instance.settings.username = username.text;
+          Components.instance.settings.password = password.text;
+          
+          URLRequestDefaults.setLoginCredentialsForHost(Application.application.host,
+                                                        Components.instance.settings.username,
+                                                        Components.instance.settings.password);
+          loginService.send();
+        }
+    
+        Components.instance.settings.startOnLoggin = startOnLoggin.selected;  
+        Components.instance.settings.showCoreMediaBlog = showCoreMediaBlog.selected;  
+        Components.instance.settings.notificationSoundIndex = sound.selectedIndex;
+      }
+      
+            
     ]]>
   </mx:Script>
-  <mx:VBox top="24" left="4" width="100%">
+  <mx:HTTPService id="loginService"
+    url="{Application.application.protocol}{Application.application.host}/account/verify_credentials.xml"
+    result="handleResult()"
+    fault="handleError(event)">
+  </mx:HTTPService>
+  
+  <mx:StringValidator id="nameV" source="{username}"
+    property="text" required="true" />
+  <mx:StringValidator id="passV" source="{password}"
+    property="text" required="true"/>
+    
+  <mx:VBox top="12" left="12" bottom="12" right="12" width="100%">
+    <mx:HBox>
+      <mx:Label text="User name" fontWeight="bold"/>
+      <mx:TextInput color="#000000" id="username" text="{Components.instance.settings.username}" />   
+    </mx:HBox>
+    <mx:HBox>
+      <mx:Label text="Password" fontWeight="bold"/>
+      <mx:TextInput color="#000000" id="password" text="{Components.instance.settings.password}" displayAsPassword="true"/>
+    </mx:HBox>
+    <mx:Label id="error" color="red"/>
+    
+    <mx:Spacer height="12"/>
     <mx:HBox  toolTip="Start on loggin">
       <mx:Label text="Start on loggin" fontWeight="bold"/>
-      <mx:CheckBox id="startOnLoggin" selected="{Components.instance.settings.startOnLoggin}" change="Components.instance.settings.startOnLoggin = startOnLoggin.selected"/>   
+      <mx:CheckBox id="startOnLoggin" selected="{Components.instance.settings.startOnLoggin}"/>   
     </mx:HBox>  
     <mx:Text condenseWhite="true" width="100%">
      <mx:htmlText>
@@ -23,7 +80,7 @@
     </mx:Text> 
     <mx:HBox  toolTip="Show CoreMedia Blog">
       <mx:Label text="Show CoreMedia Blog" fontWeight="bold"/>
-      <mx:CheckBox id="showCoreMediaBlog" selected="{Components.instance.settings.showCoreMediaBlog}" change="Components.instance.settings.showCoreMediaBlog = showCoreMediaBlog.selected"/>   
+      <mx:CheckBox id="showCoreMediaBlog" selected="{Components.instance.settings.showCoreMediaBlog}"/>   
     </mx:HBox>  
     <mx:Text condenseWhite="true" width="100%">
      <mx:htmlText>
@@ -31,18 +88,17 @@
          <p>Show the latest CoreMedia Blog entries.</p>
        ]]>
      </mx:htmlText>
-    </mx:Text>
-   <mx:Spacer height="24"/>
+    </mx:Text>   
    <mx:HBox  toolTip="Mähhhh! You cannot disable sound ;-)">
       <mx:Label text="Sound notification" fontWeight="bold"/>
       <mx:VBox>
         <mx:ComboBox 
           id="sound" 
+          color="#000000"
           dataProvider="{Components.instance.sounds}" 
-          selectedIndex="{Components.instance.settings.notificationSoundIndex}"
-          change="Components.instance.settings.notificationSoundIndex = sound.selectedIndex"/>
+          selectedIndex="{Components.instance.settings.notificationSoundIndex}"/>
       </mx:VBox>
     </mx:HBox>
-  </mx:VBox>
-  
+    <mx:Button id="saveBtn" label="Save" click="save()" />
+  </mx:VBox>    
 </mx:Canvas>

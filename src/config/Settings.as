@@ -10,10 +10,7 @@ package config
     
     [Bindable]
 	  public var startOnLoggin:Boolean = true;
-	  
-	  [Bindable]
-	  public var autoLogin:Boolean = true;
-	  	  
+	  	  	  
 	  [Bindable]
 	  public var username:String;
 	  
@@ -39,8 +36,6 @@ package config
            
       if(settings.data.showCoreMediaBlog != null)
         showCoreMediaBlog = settings.data.showCoreMediaBlog;
-      if(settings.data.autoLogin != null)
-        autoLogin = settings.data.autoLogin;
       if(settings.data.startOnLoggin != null)
         startOnLoggin = settings.data.startOnLoggin;
       
@@ -56,7 +51,6 @@ package config
       var settings:SharedObject = SharedObject.getLocal(SETTINGS_SO);      
       settings.data.showCoreMediaBlog = showCoreMediaBlog;
       settings.data.startOnLoggin = startOnLoggin; 
-      settings.data.autoLogin = autoLogin;
       
       settings.data.username = username;
       settings.data.password = password;

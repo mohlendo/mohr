@@ -8,29 +8,16 @@
   verticalScrollPolicy="off"
   horizontalScrollPolicy="off"
   xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*">
-  
   <mx:Script>
     <![CDATA[
-      import config.Components;
-    	import util.ParseUtils;
-	    import mx.core.Application;
-	    
-	    private function showVideo():void
-	    {
-	      Components.instance.analyticsTracker.trackEvent("status","Show Video"); 
-	      var popup:VideoPlayerPopup = new VideoPlayerPopup();
-	      popup.videoUrl = ParseUtils.getVideoUrl(data.text);
-	      popup.open(true);
-	    }
-
+      import util.ParseUtils;
     ]]>
   </mx:Script>
+  
   <local:UserItemRenderer id="user" data="{data.user}" width="48" height="48" mouseOut="user.mouseOut()" mouseOver="user.mouseOver();" />
   <mx:VBox width="100%" height="100%" verticalGap="0">
     <mx:Text id="mainText" width="100%" condenseWhite="true" doubleClickEnabled="false"
-      includeInLayout="{ParseUtils.getVideoUrl(data.text)== null}" visible="{ParseUtils.getVideoUrl(data.text)== null}"
       htmlText="&lt;b&gt;&lt;font color='#0099ff'&gt;{data.user.screen_name}&lt;/font&gt;&lt;/b&gt; {ParseUtils.formatText(data.text)}"/>
     <mx:Text text="{data.user.name}, {ParseUtils.calcInterval(data.created_at)} via {data.source}" color="#0099ff"  fontSize="8"/>
-    <mx:Button label="Play Video Trill" click="showVideo()" includeInLayout="{ParseUtils.getVideoUrl(data.text)!= null}" visible="{ParseUtils.getVideoUrl(data.text)!= null}"/>
   </mx:VBox>
 </mx:HBox>

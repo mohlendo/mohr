@@ -67,7 +67,7 @@ package components
       var item:TrillrItemRenderer = new TrillrItemRenderer();
       item.data = data;
       notifyWindow.addChild(item);
-      notifyWindow.open(true);           
+      notifyWindow.open(false);           
       var bounds:Rectangle = Screen.mainScreen.visibleBounds;   	
       notifyWindow.nativeWindow.x = bounds.bottomRight.x - notifyWindow.width, 
       notifyWindow.nativeWindow.y = bounds.bottomRight.y - notifyWindow.height;                      

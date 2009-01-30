@@ -32,7 +32,7 @@
         groupService.send();
       }
      
-      private function loadData(e:Event):void
+      public function loadData(e:Event):void
       {
       	lastScrollPostion = timeline.verticalScrollPosition;
         timeLineService.send();
