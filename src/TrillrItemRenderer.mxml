@@ -7,16 +7,20 @@
   backgroundColor="#FFFFFF"
   verticalScrollPolicy="off"
   horizontalScrollPolicy="off"
-  xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*">
+  xmlns:mx="http://www.adobe.com/2006/mxml" 
+  xmlns:local="*">
   <mx:Script>
     <![CDATA[
-      import util.ParseUtils;
+      import util.ParseUtils;    
     ]]>
   </mx:Script>
   
   <local:UserItemRenderer id="user" data="{data.user}" width="48" height="48" mouseOut="user.mouseOut()" mouseOver="user.mouseOver();" />
   <mx:VBox width="100%" height="100%" verticalGap="0">
-    <mx:Text id="mainText" width="100%" condenseWhite="true" doubleClickEnabled="false"
+    <mx:Text id="mainText" 
+      width="100%" 
+      condenseWhite="true" 
+      doubleClickEnabled="false"
       htmlText="&lt;b&gt;&lt;font color='#0099ff'&gt;{data.user.screen_name}&lt;/font&gt;&lt;/b&gt; {ParseUtils.formatText(data.text)}"/>
     <mx:Text text="{data.user.name}, {ParseUtils.calcInterval(data.created_at)} via {data.source}" color="#0099ff"  fontSize="8"/>
   </mx:VBox>

@@ -27,7 +27,7 @@
     private var dockImage:BitmapData;
     
     [Bindable]
-    public var protocol:String = "http://";
+    public var protocol:String = "https://";
   
     [Bindable]
     public var host:String = "trillr.coremedia.com";//"mock/";//  
