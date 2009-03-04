@@ -1,0 +1,5 @@
+mohr is a Adobe AIR based client for the microblogging plattform trillr (https://trillr.coremedia.com) 
+It is actually quite twitter-like and supports the same style of API. 
+Therefor it should be possible to extend it to use twitter instead.
+
+The code is licensed under BSD.
